@@ -80,9 +80,14 @@ export function RouteMap({
           }
         }
 
-        if (coords.length > 1) {
+        // Use waypoints for polyline if available, otherwise fall back to stop coords
+        const polyCoords: L.LatLngTuple[] = route.waypoints
+          ? route.waypoints as L.LatLngTuple[]
+          : coords;
+
+        if (polyCoords.length > 1) {
           leaflet
-            .polyline(coords, {
+            .polyline(polyCoords, {
               color: route.color,
               weight: 3,
               opacity: 0.8,

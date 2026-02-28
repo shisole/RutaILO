@@ -184,7 +184,12 @@ export default function MapPage() {
           }
         }
 
-        if (coords.length > 1) {
+        // Use waypoints for polyline if available, otherwise fall back to stop coords
+        const polyCoords: L.LatLngTuple[] = route.waypoints
+          ? route.waypoints as L.LatLngTuple[]
+          : coords;
+
+        if (polyCoords.length > 1) {
           const routePopupHtml = `
             <div style="min-width:140px;">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
@@ -196,7 +201,7 @@ export default function MapPage() {
           `;
 
           const polyline = leaflet
-            .polyline(coords, {
+            .polyline(polyCoords, {
               color: route.color,
               weight: 4,
               opacity: 0.85,
