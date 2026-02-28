@@ -14,23 +14,43 @@ interface RoutePlanMapProps {
   height?: string;
 }
 
-function closestWaypointIndex(
+/**
+ * For each stop in the route (in order), find its closest waypoint index,
+ * constrained so indices are monotonically non-decreasing. This prevents
+ * a stop from matching a waypoint on a different segment when the road
+ * geometry loops near another part of the route.
+ */
+function buildStopWaypointIndices(
   waypoints: [number, number][],
-  lat: number,
-  lng: number,
-): number {
-  let bestIdx = 0;
-  let bestDist = Infinity;
-  for (let i = 0; i < waypoints.length; i++) {
-    const dlat = waypoints[i][0] - lat;
-    const dlng = waypoints[i][1] - lng;
-    const dist = dlat * dlat + dlng * dlng;
-    if (dist < bestDist) {
-      bestDist = dist;
-      bestIdx = i;
+  stopIds: string[],
+): number[] {
+  const indices: number[] = [];
+  let searchFrom = 0;
+
+  for (const stopId of stopIds) {
+    const stop = stops[stopId];
+    if (!stop) {
+      indices.push(searchFrom);
+      continue;
     }
+
+    let bestIdx = searchFrom;
+    let bestDist = Infinity;
+    for (let i = searchFrom; i < waypoints.length; i++) {
+      const dlat = waypoints[i][0] - stop.lat;
+      const dlng = waypoints[i][1] - stop.lng;
+      const dist = dlat * dlat + dlng * dlng;
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+
+    indices.push(bestIdx);
+    searchFrom = bestIdx;
   }
-  return bestIdx;
+
+  return indices;
 }
 
 export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
@@ -87,19 +107,21 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
         if (!fromStop || !toStop) continue;
 
         const waypoints = routeWaypoints[route.id];
+        const fromRouteIdx = route.stopIds.indexOf(step.fromStopId);
+        const toRouteIdx = route.stopIds.indexOf(step.toStopId);
 
         let segmentCoords: L.LatLngTuple[];
 
-        if (waypoints && waypoints.length > 1) {
-          const fromIdx = closestWaypointIndex(waypoints, fromStop.lat, fromStop.lng);
-          const toIdx = closestWaypointIndex(waypoints, toStop.lat, toStop.lng);
-          const startIdx = Math.min(fromIdx, toIdx);
-          const endIdx = Math.max(fromIdx, toIdx);
-          segmentCoords = waypoints.slice(startIdx, endIdx + 1);
+        if (waypoints && waypoints.length > 1 && fromRouteIdx !== -1 && toRouteIdx !== -1) {
+          // Map each stop to its waypoint index (monotonically ordered)
+          const stopWpIndices = buildStopWaypointIndices(waypoints, route.stopIds);
+          const startRouteIdx = Math.min(fromRouteIdx, toRouteIdx);
+          const endRouteIdx = Math.max(fromRouteIdx, toRouteIdx);
+          const wpStart = stopWpIndices[startRouteIdx];
+          const wpEnd = stopWpIndices[endRouteIdx];
+          segmentCoords = waypoints.slice(wpStart, wpEnd + 1);
         } else {
           // Fallback: use stop coordinates along the route between from and to
-          const fromRouteIdx = route.stopIds.indexOf(step.fromStopId);
-          const toRouteIdx = route.stopIds.indexOf(step.toStopId);
           const startIdx = Math.min(fromRouteIdx, toRouteIdx);
           const endIdx = Math.max(fromRouteIdx, toRouteIdx);
           segmentCoords = route.stopIds.slice(startIdx, endIdx + 1).flatMap((sid) => {
