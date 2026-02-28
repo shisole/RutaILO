@@ -19,12 +19,18 @@ export default function Home() {
           or search for your route below.
         </p>
 
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
           <Link
             href="/find"
             className="inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-8 text-base font-medium text-white transition-colors hover:bg-blue-700"
           >
             Find Route
+          </Link>
+          <Link
+            href="/map"
+            className="inline-flex h-12 items-center justify-center rounded-lg bg-emerald-600 px-8 text-base font-medium text-white transition-colors hover:bg-emerald-700"
+          >
+            View Map
           </Link>
           <Link
             href="/routes"
