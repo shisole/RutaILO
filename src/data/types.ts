@@ -11,6 +11,7 @@ export interface Route {
   name: string;
   color: string; // hex color e.g. "#3B82F6"
   stopIds: string[]; // ordered list of stop IDs along the route
+  waypoints?: [number, number][]; // detailed [lat, lng] path for map rendering
 }
 
 export interface TransferStep {
