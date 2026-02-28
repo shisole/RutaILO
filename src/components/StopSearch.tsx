@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+
 import { stops } from "@/data/stops";
 
 interface StopSearchProps {
@@ -25,9 +26,7 @@ export function StopSearch({
 
   // Filter stops based on query
   const filtered = query
-    ? allStops.filter((s) =>
-        s.name.toLowerCase().includes(query.toLowerCase())
-      )
+    ? allStops.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
     : allStops;
 
   const suggestions = filtered.slice(0, 10);
@@ -35,10 +34,8 @@ export function StopSearch({
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      const target: Node | null = e.target instanceof Node ? e.target : null;
+      if (containerRef.current && target && !containerRef.current.contains(target)) {
         setIsOpen(false);
       }
     }

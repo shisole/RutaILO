@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from "vitest";
+
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 import type { Route, Stop } from "@/data/types";

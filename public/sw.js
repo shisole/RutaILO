@@ -1,24 +1,18 @@
 const CACHE_NAME = "rutailo-v1";
-const PRECACHE_URLS = [
-  "/",
-  "/find",
-  "/routes",
-];
+const PRECACHE_URLS = ["/", "/find", "/routes"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)));
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((names) =>
-      Promise.all(
-        names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
-      )
-    )
+    caches
+      .keys()
+      .then((names) =>
+        Promise.all(names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))),
+      ),
   );
   self.clients.claim();
 });
@@ -35,6 +29,6 @@ self.addEventListener("fetch", (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned));
         return response;
       });
-    })
+    }),
   );
 });

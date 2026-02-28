@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+
 import { RouteCard } from "@/components/RouteCard";
 
 const mockRoute = {

@@ -7,10 +7,11 @@
  * Usage: npx tsx src/scripts/generate-waypoints.ts
  */
 
-import { routes } from "../data/routes";
-import { stops } from "../data/stops";
 import fs from "fs";
 import path from "path";
+
+import { routes } from "../data/routes";
+import { stops } from "../data/stops";
 
 const OSRM_BASE = "https://router.project-osrm.org/route/v1/driving";
 
@@ -25,7 +26,7 @@ interface OSRMResponse {
 }
 
 async function getRouteGeometry(
-  coordinates: [number, number][] // [lng, lat] pairs for OSRM
+  coordinates: [number, number][], // [lng, lat] pairs for OSRM
 ): Promise<[number, number][] | null> {
   const coordString = coordinates.map(([lng, lat]) => `${lng},${lat}`).join(";");
   const url = `${OSRM_BASE}/${coordString}?overview=full&geometries=geojson`;

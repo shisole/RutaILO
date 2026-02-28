@@ -1,8 +1,9 @@
 // @vitest-environment node
 import { describe, it, expect } from "vitest";
-import { findRoute } from "@/lib/router";
+
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
+import { findRoute } from "@/lib/router";
 
 describe("findRoute", () => {
   it("returns null when origin equals destination", () => {
@@ -24,9 +25,7 @@ describe("findRoute", () => {
   it("finds a route with one transfer", () => {
     const route1 = routes[0];
     const route2 = routes.find(
-      (r) =>
-        r.id !== route1.id &&
-        r.stopIds.some((s) => route1.stopIds.includes(s))
+      (r) => r.id !== route1.id && r.stopIds.some((s) => route1.stopIds.includes(s)),
     );
     if (!route2) return;
     const origin = route1.stopIds[0];

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import type { Route } from "@/data/types";
-import { stops } from "@/data/stops";
-import { routeWaypoints } from "@/data/waypoints";
 import type L from "leaflet";
+import { useEffect, useRef } from "react";
+
+import { stops } from "@/data/stops";
+import type { Route } from "@/data/types";
+import { routeWaypoints } from "@/data/waypoints";
 
 interface RouteMapProps {
   routesToShow: Route[];
@@ -27,11 +28,7 @@ function ensureLeafletCss(): Promise<void> {
   });
 }
 
-export function RouteMap({
-  routesToShow,
-  highlightStopId,
-  height = "200px",
-}: RouteMapProps) {
+export function RouteMap({ routesToShow, highlightStopId, height = "200px" }: RouteMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
@@ -87,9 +84,8 @@ export function RouteMap({
         }
 
         // Use OSRM road-snapped waypoints if available, otherwise fall back to stop coords
-        const polyCoords: L.LatLngTuple[] = routeWaypoints[route.id]
-          ? routeWaypoints[route.id] as L.LatLngTuple[]
-          : coords;
+        const waypoints: [number, number][] | undefined = routeWaypoints[route.id];
+        const polyCoords: L.LatLngTuple[] = waypoints ?? coords;
 
         if (polyCoords.length > 1) {
           leaflet

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import Link from "next/link";
 import type L from "leaflet";
+import Link from "next/link";
+import { useEffect, useRef, useState, useCallback } from "react";
+
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 import { routeWaypoints } from "@/data/waypoints";
@@ -24,8 +25,7 @@ function ensureLeafletCss(): Promise<void> {
 
 // Build a lookup: stopId -> list of routes serving it
 function buildStopRoutesMap() {
-  const map: Record<string, { number: number; name: string; color: string }[]> =
-    {};
+  const map: Record<string, { number: number; name: string; color: string }[]> = {};
   for (const route of routes) {
     for (const stopId of route.stopIds) {
       if (!map[stopId]) map[stopId] = [];
@@ -44,29 +44,26 @@ const stopRoutesMap = buildStopRoutesMap();
 export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const routeLayersRef = useRef<
-    Map<string, { polyline: L.Polyline; markers: L.CircleMarker[] }>
-  >(new Map());
+  const routeLayersRef = useRef<Map<string, { polyline: L.Polyline; markers: L.CircleMarker[] }>>(
+    new Map(),
+  );
 
   const [visibleRoutes, setVisibleRoutes] = useState<Set<string>>(() => {
     return new Set(routes.map((r) => r.id));
   });
   const [legendOpen, setLegendOpen] = useState(false);
 
-  const toggleRoute = useCallback(
-    (routeId: string) => {
-      setVisibleRoutes((prev) => {
-        const next = new Set(prev);
-        if (next.has(routeId)) {
-          next.delete(routeId);
-        } else {
-          next.add(routeId);
-        }
-        return next;
-      });
-    },
-    []
-  );
+  const toggleRoute = useCallback((routeId: string) => {
+    setVisibleRoutes((prev) => {
+      const next = new Set(prev);
+      if (next.has(routeId)) {
+        next.delete(routeId);
+      } else {
+        next.add(routeId);
+      }
+      return next;
+    });
+  }, []);
 
   // Sync layer visibility with visibleRoutes state
   useEffect(() => {
@@ -127,8 +124,7 @@ export default function MapPage() {
       leaflet
         .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 19,
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         })
         .addTo(map);
 
@@ -154,14 +150,14 @@ export default function MapPage() {
               const colorDots = servingRoutes
                 .map(
                   (r) =>
-                    `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color};margin-right:3px;" title="Route ${r.number}"></span>`
+                    `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color};margin-right:3px;" title="Route ${r.number}"></span>`,
                 )
                 .join("");
 
               const routeList = servingRoutes
                 .map(
                   (r) =>
-                    `<span style="display:flex;align-items:center;gap:4px;font-size:12px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0;"></span>${r.number}. ${r.name}</span>`
+                    `<span style="display:flex;align-items:center;gap:4px;font-size:12px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0;"></span>${r.number}. ${r.name}</span>`,
                 )
                 .join("");
 
@@ -191,9 +187,8 @@ export default function MapPage() {
         }
 
         // Use OSRM road-snapped waypoints if available, otherwise fall back to stop coords
-        const polyCoords: L.LatLngTuple[] = routeWaypoints[route.id]
-          ? routeWaypoints[route.id] as L.LatLngTuple[]
-          : coords;
+        const waypoints: [number, number][] | undefined = routeWaypoints[route.id];
+        const polyCoords: L.LatLngTuple[] = waypoints ?? coords;
 
         if (polyCoords.length > 1) {
           const routePopupHtml = `
@@ -240,22 +235,19 @@ export default function MapPage() {
   }, []);
 
   const allVisible = visibleRoutes.size === routes.length;
-  const noneVisible = visibleRoutes.size === 0;
 
   return (
     <div className="flex flex-col bg-gray-50" style={{ height: "100dvh" }}>
       {/* Header */}
-      <header className="flex items-center justify-between bg-white px-4 py-3 shadow-sm" style={{ flexShrink: 0 }}>
+      <header
+        className="flex items-center justify-between bg-white px-4 py-3 shadow-sm"
+        style={{ flexShrink: 0 }}
+      >
         <Link
           href="/"
           className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900"
         >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -270,12 +262,7 @@ export default function MapPage() {
           onClick={() => setLegendOpen(!legendOpen)}
           className="flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100"
         >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -289,15 +276,16 @@ export default function MapPage() {
 
       {/* Map */}
       <div className="relative" style={{ flex: "1 1 0%", minHeight: 0 }}>
-        <div ref={mapContainerRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
+        <div
+          ref={mapContainerRef}
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+        />
 
         {/* Legend Panel */}
         {legendOpen && (
           <div className="absolute inset-x-0 bottom-0 z-[1000] max-h-[60vh] overflow-y-auto rounded-t-2xl bg-white shadow-lg">
             <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white px-4 py-3">
-              <h2 className="text-base font-semibold text-gray-900">
-                Route Legend
-              </h2>
+              <h2 className="text-base font-semibold text-gray-900">Route Legend</h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
@@ -315,12 +303,7 @@ export default function MapPage() {
                   onClick={() => setLegendOpen(false)}
                   className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                 >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -339,9 +322,7 @@ export default function MapPage() {
                     <button
                       onClick={() => toggleRoute(route.id)}
                       className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                        isVisible
-                          ? "hover:bg-gray-50"
-                          : "opacity-50 hover:bg-gray-50"
+                        isVisible ? "hover:bg-gray-50" : "opacity-50 hover:bg-gray-50"
                       }`}
                     >
                       <span
@@ -349,8 +330,7 @@ export default function MapPage() {
                         style={{ backgroundColor: route.color }}
                       />
                       <span className="flex-1 text-sm text-gray-800">
-                        <span className="font-semibold">{route.number}.</span>{" "}
-                        {route.name}
+                        <span className="font-semibold">{route.number}.</span> {route.name}
                       </span>
                       <svg
                         className={`h-5 w-5 flex-shrink-0 ${

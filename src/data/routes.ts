@@ -7,14 +7,7 @@ export const routes: Route[] = [
     number: 1,
     name: "Bo. Obrero-Lapuz to City Proper Loop",
     color: "#3B82F6", // blue
-    stopIds: [
-      "bo-obrero",
-      "lapuz",
-      "lapuz-norte",
-      "diversion-road",
-      "delgado-st",
-      "city-proper",
-    ],
+    stopIds: ["bo-obrero", "lapuz", "lapuz-norte", "diversion-road", "delgado-st", "city-proper"],
   },
 
   // Route 2: Villa Plaza to City Proper via Calumpang
@@ -158,14 +151,7 @@ export const routes: Route[] = [
     number: 10,
     name: "Buntatala/Tagbak to City Proper",
     color: "#84CC16", // lime
-    stopIds: [
-      "buntatala",
-      "molo-plaza",
-      "molo-blvd",
-      "baluarte",
-      "delgado-st",
-      "city-proper",
-    ],
+    stopIds: ["buntatala", "molo-plaza", "molo-blvd", "baluarte", "delgado-st", "city-proper"],
   },
 
   // Route 11: Ticud La Paz to City Proper
@@ -258,14 +244,7 @@ export const routes: Route[] = [
     number: 16,
     name: "Bito-on to Jaro via Balabago Loop",
     color: "#7C3AED", // purple
-    stopIds: [
-      "bito-on",
-      "balabago",
-      "ungka-junction",
-      "cpu",
-      "jaro-liko",
-      "jaro-plaza",
-    ],
+    stopIds: ["bito-on", "balabago", "ungka-junction", "cpu", "jaro-liko", "jaro-plaza"],
   },
 
   // Route 17: Villa Baybay to City Proper
@@ -274,14 +253,7 @@ export const routes: Route[] = [
     number: 17,
     name: "Villa Baybay to City Proper",
     color: "#0284C7", // blue-dark
-    stopIds: [
-      "villa-baybay",
-      "arevalo-plaza",
-      "mohon",
-      "molo-plaza",
-      "gen-luna",
-      "city-proper",
-    ],
+    stopIds: ["villa-baybay", "arevalo-plaza", "mohon", "molo-plaza", "gen-luna", "city-proper"],
   },
 
   // Route 18: Buntatala/Tagbak to City Proper via Lapuz
@@ -290,14 +262,7 @@ export const routes: Route[] = [
     number: 18,
     name: "Buntatala/Tagbak to City Proper via Lapuz",
     color: "#EA580C", // orange-dark
-    stopIds: [
-      "buntatala",
-      "molo-plaza",
-      "baluarte",
-      "lapuz",
-      "lapuz-norte",
-      "city-proper",
-    ],
+    stopIds: ["buntatala", "molo-plaza", "baluarte", "lapuz", "lapuz-norte", "city-proper"],
   },
 
   // Route 19: Bito-on to City Proper via La Paz
@@ -306,15 +271,7 @@ export const routes: Route[] = [
     number: 19,
     name: "Bito-on to City Proper via La Paz",
     color: "#65A30D", // lime-dark
-    stopIds: [
-      "bito-on",
-      "balabago",
-      "cpu",
-      "jaro-plaza",
-      "la-paz-market",
-      "la-paz",
-      "city-proper",
-    ],
+    stopIds: ["bito-on", "balabago", "cpu", "jaro-plaza", "la-paz-market", "la-paz", "city-proper"],
   },
 
   // Route 20: Mohon to ISATU via Sooc / Festive Walk
@@ -356,15 +313,7 @@ export const routes: Route[] = [
     number: 22,
     name: "Ungka to La Paz via CPU / ISATU Loop",
     color: "#0D9488", // teal-dark
-    stopIds: [
-      "ungka",
-      "ungka-junction",
-      "cpu",
-      "jaro-plaza",
-      "isatu",
-      "la-paz-market",
-      "la-paz",
-    ],
+    stopIds: ["ungka", "ungka-junction", "cpu", "jaro-plaza", "isatu", "la-paz-market", "la-paz"],
   },
 
   // Route 23: Mohon to Mandurriao Business District
@@ -408,13 +357,6 @@ export const routes: Route[] = [
     number: 25,
     name: "Molo to City Proper via Gen. Luna",
     color: "#9333EA", // purple-vivid
-    stopIds: [
-      "molo-plaza",
-      "molo-blvd",
-      "gen-luna",
-      "rizal-st",
-      "valeria-st",
-      "city-proper",
-    ],
+    stopIds: ["molo-plaza", "molo-blvd", "gen-luna", "rizal-st", "valeria-st", "city-proper"],
   },
 ];

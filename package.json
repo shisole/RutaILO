@@ -7,8 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
-    "generate-qr": "npx tsx src/scripts/generate-qr.ts"
+    "generate-qr": "npx tsx src/scripts/generate-qr.ts",
+    "generate-waypoints": "npx tsx src/scripts/generate-waypoints.ts"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
@@ -31,7 +35,11 @@
     "@vitejs/plugin-react": "^4.7.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
     "jsdom": "^25.0.1",
+    "prettier": "^3.8.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"

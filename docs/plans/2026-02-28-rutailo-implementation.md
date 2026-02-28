@@ -13,6 +13,7 @@
 ## Task 1: Project Scaffolding
 
 **Files:**
+
 - Create: `package.json`
 - Create: `next.config.ts`
 - Create: `tailwind.config.ts`
@@ -25,6 +26,7 @@
 **Step 1: Initialize Next.js project**
 
 Run:
+
 ```bash
 cd /Users/stephenkarljeoffreyhisole/Documents/project/claude-apps/RutaILO
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
@@ -35,6 +37,7 @@ Expected: Project scaffolded with Next.js, TypeScript, Tailwind, App Router, `sr
 **Step 2: Install additional dependencies**
 
 Run:
+
 ```bash
 cd /Users/stephenkarljeoffreyhisole/Documents/project/claude-apps/RutaILO
 npm install leaflet react-leaflet qrcode
@@ -44,6 +47,7 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom @ty
 **Step 3: Configure Vitest**
 
 Create `vitest.config.ts`:
+
 ```ts
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
@@ -65,6 +69,7 @@ export default defineConfig({
 ```
 
 Create `src/test/setup.ts`:
+
 ```ts
 import "@testing-library/jest-dom/vitest";
 ```
@@ -105,6 +110,7 @@ git commit -m "chore: scaffold Next.js project with Tailwind, Vitest, Leaflet"
 ## Task 2: Route & Stop Data Model
 
 **Files:**
+
 - Create: `src/data/types.ts`
 - Create: `src/data/routes.ts`
 - Create: `src/data/stops.ts`
@@ -113,6 +119,7 @@ git commit -m "chore: scaffold Next.js project with Tailwind, Vitest, Leaflet"
 **Step 1: Write the failing test**
 
 Create `src/data/__tests__/data.test.ts`:
+
 ```ts
 import { describe, it, expect } from "vitest";
 import { routes } from "@/data/routes";
@@ -175,6 +182,7 @@ Expected: FAIL — modules not found.
 **Step 3: Create the type definitions**
 
 Create `src/data/types.ts`:
+
 ```ts
 export interface Stop {
   id: string;
@@ -211,6 +219,7 @@ export interface RoutePlan {
 Create `src/data/routes.ts` with all 25 routes. Each route uses real Iloilo route names. Use placeholder stops with approximate GPS coordinates for now — the exact stops can be refined with real ELPTRP data later.
 
 The 25 Iloilo City ELPTRP routes are:
+
 1. Bo. Obrero-Lapuz to City Proper Loop
 2. Villa Plaza to City Proper via Calumpang
 3. Ungka to City Proper via CPU
@@ -258,12 +267,14 @@ git commit -m "feat: add route and stop data model with 25 Iloilo jeepney routes
 ## Task 3: Routing Algorithm
 
 **Files:**
+
 - Create: `src/lib/router.ts`
 - Create: `src/lib/__tests__/router.test.ts`
 
 **Step 1: Write the failing tests**
 
 Create `src/lib/__tests__/router.test.ts`:
+
 ```ts
 import { describe, it, expect } from "vitest";
 import { findRoute } from "@/lib/router";
@@ -294,9 +305,7 @@ describe("findRoute", () => {
     // Use routes that share a common stop (transfer point)
     const route1 = routes[0];
     const route2 = routes.find(
-      (r) =>
-        r.id !== route1.id &&
-        r.stopIds.some((s) => route1.stopIds.includes(s)) // shares at least one stop
+      (r) => r.id !== route1.id && r.stopIds.some((s) => route1.stopIds.includes(s)), // shares at least one stop
     );
 
     if (!route2) {
@@ -346,6 +355,7 @@ Expected: FAIL — `findRoute` not found.
 Create `src/lib/router.ts`:
 
 The algorithm uses BFS (breadth-first search) on a route-stop graph:
+
 1. Build an adjacency map: for each stop, list all routes serving it
 2. BFS from origin stop, exploring reachable stops via each route
 3. Priority: minimize transfers first, then minimize total stops
@@ -366,7 +376,7 @@ export function findRoute(
   originId: string,
   destId: string,
   routes: Route[],
-  stops: Record<string, Stop>
+  stops: Record<string, Stop>,
 ): RoutePlan | null {
   if (originId === destId) return null;
   if (!stops[originId] || !stops[destId]) return null;
@@ -401,9 +411,7 @@ export function findRoute(
 
   while (queue.length > 0) {
     // Sort by transfers first, then total stops (priority queue)
-    queue.sort(
-      (a, b) => a.transfers - b.transfers || a.totalStops - b.totalStops
-    );
+    queue.sort((a, b) => a.transfers - b.transfers || a.totalStops - b.totalStops);
     const node = queue.shift()!;
 
     if (!node.routeId) continue;
@@ -413,11 +421,7 @@ export function findRoute(
 
     // Travel along this route in both directions
     for (const direction of [1, -1] as const) {
-      for (
-        let i = currentIdx + direction;
-        i >= 0 && i < route.stopIds.length;
-        i += direction
-      ) {
+      for (let i = currentIdx + direction; i >= 0 && i < route.stopIds.length; i += direction) {
         const nextStopId = route.stopIds[i];
         const stopsRidden = Math.abs(i - currentIdx);
 
@@ -432,23 +436,16 @@ export function findRoute(
 
         // Reconstruct path: keep existing path, update last ride or add new
         const newPath = [...node.path];
-        if (
-          newPath.length > 0 &&
-          newPath[newPath.length - 1].routeId === route.id
-        ) {
+        if (newPath.length > 0 && newPath[newPath.length - 1].routeId === route.id) {
           // Extend the last ride step
           newPath[newPath.length - 1] = {
             ...newPath[newPath.length - 1],
             toStopId: nextStopId,
-            stopCount:
-              (newPath[newPath.length - 1].stopCount || 0) + 1,
+            stopCount: (newPath[newPath.length - 1].stopCount || 0) + 1,
           };
         } else {
           // Start a new ride on this route
-          const fromStop =
-            newPath.length > 0
-              ? newPath[newPath.length - 1].toStopId
-              : node.stopId;
+          const fromStop = newPath.length > 0 ? newPath[newPath.length - 1].toStopId : node.stopId;
           newPath.push({
             type: "ride",
             routeId: route.id,
@@ -509,6 +506,7 @@ git commit -m "feat: add BFS routing algorithm with transfer optimization"
 ## Task 4: Stop View Page (QR Landing)
 
 **Files:**
+
 - Create: `src/app/s/[stopId]/page.tsx`
 - Create: `src/app/s/[stopId]/__tests__/StopPage.test.tsx`
 - Create: `src/components/RouteCard.tsx`
@@ -519,6 +517,7 @@ This is the most important page — what commuters see after scanning a QR code.
 **Step 1: Write the failing test for RouteCard component**
 
 Create `src/components/__tests__/RouteCard.test.tsx`:
+
 ```tsx
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -536,9 +535,7 @@ describe("RouteCard", () => {
   it("renders route number and name", () => {
     render(<RouteCard route={mockRoute} />);
     expect(screen.getByText("1")).toBeInTheDocument();
-    expect(
-      screen.getByText("Bo. Obrero-Lapuz to City Proper Loop")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Bo. Obrero-Lapuz to City Proper Loop")).toBeInTheDocument();
   });
 
   it("displays the route color indicator", () => {
@@ -562,6 +559,7 @@ Expected: FAIL
 **Step 3: Implement RouteCard**
 
 Create `src/components/RouteCard.tsx`:
+
 ```tsx
 "use client";
 
@@ -608,8 +606,10 @@ export function RouteCard({ route }: RouteCardProps) {
           <ol className="space-y-1">
             {route.stopIds.map((stopId, i) => (
               <li key={stopId} className="flex items-center gap-2 text-sm">
-                <span className="w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-medium"
-                  style={{ borderColor: route.color, color: route.color }}>
+                <span
+                  className="w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-medium"
+                  style={{ borderColor: route.color, color: route.color }}
+                >
                   {i + 1}
                 </span>
                 <span className="text-gray-700">{stops[stopId]?.name ?? stopId}</span>
@@ -631,6 +631,7 @@ Expected: ALL PASS
 **Step 5: Create the Stop page**
 
 Create `src/app/s/[stopId]/page.tsx`:
+
 ```tsx
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
@@ -710,6 +711,7 @@ git commit -m "feat: add Stop View page with color-coded RouteCard components"
 ## Task 5: Route Finder Page
 
 **Files:**
+
 - Create: `src/app/find/page.tsx`
 - Create: `src/components/RoutePlanView.tsx`
 - Create: `src/components/StopSearch.tsx`
@@ -718,6 +720,7 @@ git commit -m "feat: add Stop View page with color-coded RouteCard components"
 **Step 1: Write the failing test for RoutePlanView**
 
 Create `src/components/__tests__/RoutePlanView.test.tsx`:
+
 ```tsx
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -767,6 +770,7 @@ Expected: FAIL
 **Step 3: Implement RoutePlanView**
 
 Create `src/components/RoutePlanView.tsx`:
+
 ```tsx
 import type { RoutePlan } from "@/data/types";
 import { routes } from "@/data/routes";
@@ -803,9 +807,7 @@ export function RoutePlanView({ plan }: RoutePlanViewProps) {
                   >
                     {route?.number}
                   </div>
-                  {i < plan.steps.length - 1 && (
-                    <div className="w-0.5 flex-1 bg-gray-200 mt-1" />
-                  )}
+                  {i < plan.steps.length - 1 && <div className="w-0.5 flex-1 bg-gray-200 mt-1" />}
                 </div>
                 <div className="flex-1 pb-2">
                   <p className="font-semibold text-gray-900">
@@ -814,9 +816,7 @@ export function RoutePlanView({ plan }: RoutePlanViewProps) {
                   <p className="text-sm text-gray-600">
                     {fromStop?.name} &rarr; {toStop?.name}
                   </p>
-                  <p className="text-sm text-gray-400">
-                    {step.stopCount} stops
-                  </p>
+                  <p className="text-sm text-gray-400">{step.stopCount} stops</p>
                 </div>
               </li>
             );
@@ -837,6 +837,7 @@ Expected: ALL PASS
 **Step 5: Create StopSearch component**
 
 Create `src/components/StopSearch.tsx`:
+
 ```tsx
 "use client";
 
@@ -849,7 +850,11 @@ interface StopSearchProps {
   value?: string;
 }
 
-export function StopSearch({ placeholder = "Search for a stop...", onSelect, value }: StopSearchProps) {
+export function StopSearch({
+  placeholder = "Search for a stop...",
+  onSelect,
+  value,
+}: StopSearchProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -902,6 +907,7 @@ export function StopSearch({ placeholder = "Search for a stop...", onSelect, val
 **Step 6: Create the Route Finder page**
 
 Create `src/app/find/page.tsx`:
+
 ```tsx
 "use client";
 
@@ -944,19 +950,11 @@ function FindContent() {
       <section className="p-4 space-y-3">
         <div>
           <label className="text-sm font-medium text-gray-600 mb-1 block">From</label>
-          <StopSearch
-            placeholder="Where are you?"
-            onSelect={setFromStopId}
-            value={fromStopId}
-          />
+          <StopSearch placeholder="Where are you?" onSelect={setFromStopId} value={fromStopId} />
         </div>
         <div>
           <label className="text-sm font-medium text-gray-600 mb-1 block">To</label>
-          <StopSearch
-            placeholder="Where are you going?"
-            onSelect={setToStopId}
-            value={toStopId}
-          />
+          <StopSearch placeholder="Where are you going?" onSelect={setToStopId} value={toStopId} />
         </div>
         <button
           onClick={handleSearch}
@@ -1008,11 +1006,13 @@ git commit -m "feat: add Route Finder page with stop search and plan display"
 ## Task 6: All Routes Browse Page
 
 **Files:**
+
 - Create: `src/app/routes/page.tsx`
 
 **Step 1: Create the All Routes page**
 
 Create `src/app/routes/page.tsx`:
+
 ```tsx
 import { routes } from "@/data/routes";
 import { RouteCard } from "@/components/RouteCard";
@@ -1026,9 +1026,7 @@ export default function RoutesPage() {
           &larr; RutaILO
         </Link>
         <h1 className="text-xl font-bold text-gray-900">All Routes</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {routes.length} jeepney routes in Iloilo City
-        </p>
+        <p className="text-sm text-gray-500 mt-1">{routes.length} jeepney routes in Iloilo City</p>
       </header>
 
       <section className="p-4">
@@ -1058,12 +1056,14 @@ git commit -m "feat: add All Routes browse page"
 ## Task 7: Home Page & Navigation
 
 **Files:**
+
 - Modify: `src/app/page.tsx`
 - Modify: `src/app/layout.tsx`
 
 **Step 1: Update the home page**
 
 Replace `src/app/page.tsx` with a landing page that has:
+
 - RutaILO branding/logo (text-based for MVP)
 - "Find Route" CTA button → links to `/find`
 - "Browse All Routes" button → links to `/routes`
@@ -1072,6 +1072,7 @@ Replace `src/app/page.tsx` with a landing page that has:
 **Step 2: Update layout.tsx**
 
 Update `src/app/layout.tsx` to include:
+
 - PWA meta tags (viewport, theme-color, apple-mobile-web-app-capable)
 - Title: "RutaILO — Iloilo Jeepney Routes"
 - Description meta tag
@@ -1093,6 +1094,7 @@ git commit -m "feat: add home page with navigation to route finder and browse"
 ## Task 8: Leaflet Map Component
 
 **Files:**
+
 - Create: `src/components/RouteMap.tsx`
 - Modify: `src/app/s/[stopId]/page.tsx` (add map)
 - Modify: `src/app/routes/page.tsx` (add map to expanded route)
@@ -1100,6 +1102,7 @@ git commit -m "feat: add home page with navigation to route finder and browse"
 **Step 1: Create the RouteMap component**
 
 Create `src/components/RouteMap.tsx`:
+
 ```tsx
 "use client";
 
@@ -1113,11 +1116,7 @@ interface RouteMapProps {
   height?: string;
 }
 
-export function RouteMap({
-  routesToShow,
-  highlightStopId,
-  height = "200px",
-}: RouteMapProps) {
+export function RouteMap({ routesToShow, highlightStopId, height = "200px" }: RouteMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
@@ -1201,6 +1200,7 @@ git commit -m "feat: add Leaflet route map component to stop and route views"
 ## Task 9: QR Code Generation
 
 **Files:**
+
 - Create: `src/scripts/generate-qr.ts`
 - Create: `public/qr/` (output directory)
 
@@ -1211,6 +1211,7 @@ Create `src/scripts/generate-qr.ts`:
 This script iterates through all stops and generates a QR code PNG for each one. Each QR encodes the URL `https://rutailo.com/s/{stopId}`. Output goes to `public/qr/{stopId}.png`.
 
 Use the `qrcode` npm package:
+
 ```ts
 import QRCode from "qrcode";
 import { stops } from "../data/stops";
@@ -1263,6 +1264,7 @@ git commit -m "feat: add QR code generation script for all stops"
 ## Task 10: PWA / Offline Support
 
 **Files:**
+
 - Create: `public/manifest.json`
 - Modify: `src/app/layout.tsx` (add manifest link)
 - Create: `public/sw.js` (service worker)
@@ -1270,6 +1272,7 @@ git commit -m "feat: add QR code generation script for all stops"
 **Step 1: Create PWA manifest**
 
 Create `public/manifest.json`:
+
 ```json
 {
   "name": "RutaILO",
@@ -1289,6 +1292,7 @@ Create `public/manifest.json`:
 **Step 2: Create a basic Service Worker**
 
 Create `public/sw.js` that uses a cache-first strategy:
+
 - On install: pre-cache the app shell and route data JSON
 - On fetch: serve from cache if available, fall back to network
 - On activate: clean old caches
@@ -1323,6 +1327,7 @@ git commit -m "feat: add PWA manifest and service worker for offline support"
 ## Task 11: Final Polish & Build Verification
 
 **Files:**
+
 - Modify: Various files for styling refinements
 
 **Step 1: Run all tests**
@@ -1338,6 +1343,7 @@ Expected: Static export succeeds with all pages generated.
 **Step 3: Test the full flow**
 
 Run: `npx serve out`
+
 1. Visit home page → navigation works
 2. Visit `/s/{stopId}` → stop view renders with routes and map
 3. Visit `/find` → search works, routing returns results
@@ -1355,18 +1361,18 @@ git commit -m "chore: final polish and build verification for RutaILO MVP"
 
 ## Task Summary
 
-| Task | Description | Estimated Complexity |
-|------|-------------|---------------------|
-| 1 | Project scaffolding | Low |
-| 2 | Route & stop data model (25 routes) | Medium |
-| 3 | BFS routing algorithm | High |
-| 4 | Stop View page (QR landing) | Medium |
-| 5 | Route Finder page | Medium |
-| 6 | All Routes browse page | Low |
-| 7 | Home page & navigation | Low |
-| 8 | Leaflet map component | Medium |
-| 9 | QR code generation script | Low |
-| 10 | PWA / offline support | Medium |
-| 11 | Final polish & build verification | Low |
+| Task | Description                         | Estimated Complexity |
+| ---- | ----------------------------------- | -------------------- |
+| 1    | Project scaffolding                 | Low                  |
+| 2    | Route & stop data model (25 routes) | Medium               |
+| 3    | BFS routing algorithm               | High                 |
+| 4    | Stop View page (QR landing)         | Medium               |
+| 5    | Route Finder page                   | Medium               |
+| 6    | All Routes browse page              | Low                  |
+| 7    | Home page & navigation              | Low                  |
+| 8    | Leaflet map component               | Medium               |
+| 9    | QR code generation script           | Low                  |
+| 10   | PWA / offline support               | Medium               |
+| 11   | Final polish & build verification   | Low                  |
 
 **Dependencies:** Task 1 must complete first. Tasks 2 and 3 are sequential (3 depends on 2). Tasks 4-8 depend on tasks 2+3. Tasks 9-10 can be done in parallel with 4-8. Task 11 is last.

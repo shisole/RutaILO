@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { Route } from "@/data/types";
+
 import { stops } from "@/data/stops";
+import type { Route } from "@/data/types";
 
 interface RouteCardProps {
   route: Route;
@@ -29,29 +30,19 @@ export function RouteCard({ route }: RouteCardProps) {
 
         {/* Route name and stop count */}
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 text-sm leading-tight">
-            {route.name}
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {route.stopIds.length} stops
-          </p>
+          <p className="font-semibold text-gray-900 text-sm leading-tight">{route.name}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{route.stopIds.length} stops</p>
         </div>
 
         {/* Chevron icon */}
         <svg
-          className={`w-5 h-5 text-gray-400 transition-transform ${
-            expanded ? "rotate-180" : ""
-          }`}
+          className={`w-5 h-5 text-gray-400 transition-transform ${expanded ? "rotate-180" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
       </div>
 
@@ -63,10 +54,7 @@ export function RouteCard({ route }: RouteCardProps) {
               const stop = stops[stopId];
               const stopName = stop ? stop.name : stopId;
               return (
-                <li
-                  key={stopId}
-                  className="flex items-center gap-2 text-sm text-gray-700"
-                >
+                <li key={stopId} className="flex items-center gap-2 text-sm text-gray-700">
                   <span
                     className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium text-white"
                     style={{ backgroundColor: route.color }}

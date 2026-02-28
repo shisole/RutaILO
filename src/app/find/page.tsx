@@ -1,14 +1,15 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { StopSearch } from "@/components/StopSearch";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+
 import { RoutePlanView } from "@/components/RoutePlanView";
-import { findRoute } from "@/lib/router";
+import { StopSearch } from "@/components/StopSearch";
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 import type { RoutePlan } from "@/data/types";
+import { findRoute } from "@/lib/router";
 
 function RouteFinderContent() {
   const searchParams = useSearchParams();
@@ -41,11 +42,7 @@ function RouteFinderContent() {
             strokeWidth={2}
             stroke="currentColor"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
           RutaILO
         </Link>
@@ -58,22 +55,14 @@ function RouteFinderContent() {
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
             From
           </label>
-          <StopSearch
-            placeholder="Where are you?"
-            value={fromStopId}
-            onSelect={setFromStopId}
-          />
+          <StopSearch placeholder="Where are you?" value={fromStopId} onSelect={setFromStopId} />
         </div>
 
         <div>
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
             To
           </label>
-          <StopSearch
-            placeholder="Where are you going?"
-            value={toStopId}
-            onSelect={setToStopId}
-          />
+          <StopSearch placeholder="Where are you going?" value={toStopId} onSelect={setToStopId} />
         </div>
 
         <button
@@ -95,9 +84,7 @@ function RouteFinderContent() {
               <RoutePlanView plan={plan} />
             ) : (
               <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
-                <p className="text-sm text-gray-500">
-                  No route found between these stops
-                </p>
+                <p className="text-sm text-gray-500">No route found between these stops</p>
               </div>
             )}
           </div>

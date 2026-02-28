@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { stops } from "@/data/stops";
-import { routes } from "@/data/routes";
+
 import { RouteCard } from "@/components/RouteCard";
 import { RouteMap } from "@/components/RouteMap";
+import { routes } from "@/data/routes";
+import { stops } from "@/data/stops";
 
 export function generateStaticParams() {
   return Object.keys(stops).map((stopId) => ({
@@ -11,11 +12,7 @@ export function generateStaticParams() {
   }));
 }
 
-export default async function StopViewPage({
-  params,
-}: {
-  params: Promise<{ stopId: string }>;
-}) {
+export default async function StopViewPage({ params }: { params: Promise<{ stopId: string }> }) {
   const { stopId } = await params;
   const stop = stops[stopId];
 
@@ -23,9 +20,7 @@ export default async function StopViewPage({
     notFound();
   }
 
-  const servingRoutes = routes.filter((route) =>
-    route.stopIds.includes(stopId)
-  );
+  const servingRoutes = routes.filter((route) => route.stopIds.includes(stopId));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,18 +37,14 @@ export default async function StopViewPage({
             strokeWidth={2}
             stroke="currentColor"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
           RutaILO
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">{stop.name}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          {servingRoutes.length} route{servingRoutes.length !== 1 ? "s" : ""}{" "}
-          pass{servingRoutes.length === 1 ? "es" : ""} through here
+          {servingRoutes.length} route{servingRoutes.length !== 1 ? "s" : ""} pass
+          {servingRoutes.length === 1 ? "es" : ""} through here
         </p>
       </header>
 

@@ -1,6 +1,6 @@
-import type { RoutePlan } from "@/data/types";
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
+import type { RoutePlan } from "@/data/types";
 
 interface RoutePlanViewProps {
   plan: RoutePlan;
@@ -14,9 +14,7 @@ export function RoutePlanView({ plan }: RoutePlanViewProps) {
       {/* Summary header */}
       <div className="flex items-center gap-3 mb-4">
         <p className="text-sm text-gray-600">
-          <span className="font-semibold text-gray-900">
-            {plan.totalStops} stops
-          </span>
+          <span className="font-semibold text-gray-900">{plan.totalStops} stops</span>
           {" total"}
           {plan.totalTransfers > 0 && (
             <>

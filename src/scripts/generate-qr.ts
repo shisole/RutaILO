@@ -1,6 +1,8 @@
-import QRCode from "qrcode";
 import fs from "fs";
 import path from "path";
+
+import QRCode from "qrcode";
+
 import { stops } from "../data/stops";
 
 const BASE_URL = "https://rutailo.com";

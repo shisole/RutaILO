@@ -54,7 +54,7 @@ export function findRoute(
   originId: string,
   destId: string,
   routes: Route[],
-  stops: Record<string, Stop>
+  stops: Record<string, Stop>,
 ): RoutePlan | null {
   // Return null if origin equals destination
   if (originId === destId) {
@@ -112,8 +112,7 @@ export function findRoute(
     if (bestResult) {
       if (
         node.transfers > bestResult.totalTransfers ||
-        (node.transfers === bestResult.totalTransfers &&
-          node.totalStops >= bestResult.totalStops)
+        (node.transfers === bestResult.totalTransfers && node.totalStops >= bestResult.totalStops)
       ) {
         continue;
       }

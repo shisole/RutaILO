@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
@@ -15,8 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "RutaILO — Iloilo Jeepney Routes",
-  description:
-    "Find jeepney routes and transfers in Iloilo City. Scan a QR code at any stop.",
+  description: "Find jeepney routes and transfers in Iloilo City. Scan a QR code at any stop.",
   other: {
     "apple-mobile-web-app-capable": "yes",
   },
@@ -33,9 +33,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#2563EB" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ServiceWorkerRegistration />
         {children}
       </body>

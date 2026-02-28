@@ -5,12 +5,8 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <main className="flex flex-col items-center gap-8 px-6 py-16 text-center">
         <div className="flex flex-col items-center gap-2">
-          <h1 className="text-5xl font-bold tracking-tight text-gray-900">
-            RutaILO
-          </h1>
-          <p className="text-lg text-gray-600">
-            Iloilo City Jeepney Routes
-          </p>
+          <h1 className="text-5xl font-bold tracking-tight text-gray-900">RutaILO</h1>
+          <p className="text-lg text-gray-600">Iloilo City Jeepney Routes</p>
         </div>
 
         <p className="max-w-sm text-base leading-relaxed text-gray-500">

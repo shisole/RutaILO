@@ -33,14 +33,14 @@ function createPNG(size, bgColor) {
       const isLetter = isPartOfR(x, y, width, height);
 
       if (isLetter) {
-        rawData[pixelOffset] = 255;     // R
+        rawData[pixelOffset] = 255; // R
         rawData[pixelOffset + 1] = 255; // G
         rawData[pixelOffset + 2] = 255; // B
         rawData[pixelOffset + 3] = 255; // A
       } else {
-        rawData[pixelOffset] = r;       // R
-        rawData[pixelOffset + 1] = g;   // G
-        rawData[pixelOffset + 2] = b;   // B
+        rawData[pixelOffset] = r; // R
+        rawData[pixelOffset + 1] = g; // G
+        rawData[pixelOffset + 2] = b; // B
         rawData[pixelOffset + 3] = 255; // A
       }
     }
@@ -56,8 +56,8 @@ function createPNG(size, bgColor) {
   const ihdrData = Buffer.alloc(13);
   ihdrData.writeUInt32BE(width, 0);
   ihdrData.writeUInt32BE(height, 4);
-  ihdrData[8] = 8;  // bit depth
-  ihdrData[9] = 6;  // color type: RGBA
+  ihdrData[8] = 8; // bit depth
+  ihdrData[9] = 6; // color type: RGBA
   ihdrData[10] = 0; // compression
   ihdrData[11] = 0; // filter
   ihdrData[12] = 0; // interlace
@@ -92,7 +92,7 @@ function crc32(buf) {
     let c = i;
     for (let j = 0; j < 8; j++) {
       if (c & 1) {
-        c = 0xEDB88320 ^ (c >>> 1);
+        c = 0xedb88320 ^ (c >>> 1);
       } else {
         c = c >>> 1;
       }
@@ -100,11 +100,11 @@ function crc32(buf) {
     table[i] = c;
   }
 
-  let crc = 0xFFFFFFFF;
+  let crc = 0xffffffff;
   for (let i = 0; i < buf.length; i++) {
-    crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+    crc = table[(crc ^ buf[i]) & 0xff] ^ (crc >>> 8);
   }
-  return (crc ^ 0xFFFFFFFF) >>> 0;
+  return (crc ^ 0xffffffff) >>> 0;
 }
 
 function isPartOfR(x, y, width, height) {
@@ -135,12 +135,21 @@ function isPartOfR(x, y, width, height) {
   }
 
   // Middle horizontal stroke
-  if (ly >= halfHeight - Math.floor(strokeWidth / 2) && ly < halfHeight + Math.ceil(strokeWidth / 2) && lx < letterWidth * 0.7) {
+  if (
+    ly >= halfHeight - Math.floor(strokeWidth / 2) &&
+    ly < halfHeight + Math.ceil(strokeWidth / 2) &&
+    lx < letterWidth * 0.7
+  ) {
     return true;
   }
 
   // Right vertical stroke of the bump (top half)
-  if (lx >= letterWidth * 0.7 - strokeWidth && lx < letterWidth * 0.7 && ly >= strokeWidth && ly < halfHeight) {
+  if (
+    lx >= letterWidth * 0.7 - strokeWidth &&
+    lx < letterWidth * 0.7 &&
+    ly >= strokeWidth &&
+    ly < halfHeight
+  ) {
     return true;
   }
 
