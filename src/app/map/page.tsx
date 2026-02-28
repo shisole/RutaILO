@@ -227,9 +227,9 @@ export default function MapPage() {
   const noneVisible = visibleRoutes.size === 0;
 
   return (
-    <div className="flex h-dvh flex-col bg-gray-50">
+    <div className="flex flex-col bg-gray-50" style={{ height: "100dvh" }}>
       {/* Header */}
-      <header className="flex items-center justify-between bg-white px-4 py-3 shadow-sm">
+      <header className="flex items-center justify-between bg-white px-4 py-3 shadow-sm" style={{ flexShrink: 0 }}>
         <Link
           href="/"
           className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900"
@@ -272,8 +272,8 @@ export default function MapPage() {
       </header>
 
       {/* Map */}
-      <div className="relative flex-1">
-        <div ref={mapContainerRef} className="h-full w-full" />
+      <div className="relative" style={{ flex: "1 1 0%", minHeight: 0 }}>
+        <div ref={mapContainerRef} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
 
         {/* Legend Panel */}
         {legendOpen && (
