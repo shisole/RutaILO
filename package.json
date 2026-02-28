@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "generate-qr": "npx tsx src/scripts/generate-qr.ts"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
