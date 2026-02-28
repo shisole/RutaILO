@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import { RoutePlanMap } from "@/components/RoutePlanMap";
 import { RoutePlanView } from "@/components/RoutePlanView";
 import { StopSearch } from "@/components/StopSearch";
 import { routes } from "@/data/routes";
@@ -81,7 +82,12 @@ function RouteFinderContent() {
               Results
             </h2>
             {plan ? (
-              <RoutePlanView plan={plan} />
+              <>
+                <RoutePlanMap plan={plan} />
+                <div className="mt-4">
+                  <RoutePlanView plan={plan} />
+                </div>
+              </>
             ) : (
               <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
                 <p className="text-sm text-gray-500">No route found between these stops</p>
