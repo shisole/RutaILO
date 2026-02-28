@@ -181,7 +181,7 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
   return (
     <div
       ref={mapContainerRef}
-      style={{ height, width: "100%" }}
+      style={{ height, width: "100%", position: "relative", zIndex: 0 }}
       className="rounded-xl overflow-hidden"
     />
   );

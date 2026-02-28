@@ -120,14 +120,14 @@ export function RoutePlanView({ plan }: RoutePlanViewProps) {
       {/* Summary header */}
       <div className="flex items-center gap-3 mb-4">
         <p className="text-sm text-gray-600">
-          <span className="font-semibold text-gray-900">{plan.totalStops} stops</span>
-          {" total"}
+          <span className="font-semibold text-gray-900">
+            {plan.steps.length} ride{plan.steps.length !== 1 ? "s" : ""}
+          </span>
           {plan.totalTransfers > 0 && (
             <>
               {" \u00B7 "}
               <span className="font-semibold text-gray-900">
-                {plan.totalTransfers} transfer
-                {plan.totalTransfers !== 1 ? "s" : ""}
+                {plan.totalTransfers} stop &amp; switch
               </span>
             </>
           )}

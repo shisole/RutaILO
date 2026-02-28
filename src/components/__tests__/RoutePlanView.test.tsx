@@ -33,8 +33,9 @@ describe("RoutePlanView", () => {
     expect(screen.getByText(/3 stops/)).toBeInTheDocument();
   });
 
-  it("shows transfer count", () => {
+  it("shows ride count and stop & switch", () => {
     render(<RoutePlanView plan={mockPlan} />);
-    expect(screen.getByText(/1 transfer/)).toBeInTheDocument();
+    expect(screen.getByText(/2 rides/)).toBeInTheDocument();
+    expect(screen.getByText(/1 stop & switch/)).toBeInTheDocument();
   });
 });

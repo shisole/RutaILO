@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 
 import { RoutePlanMap } from "@/components/RoutePlanMap";
 import { RoutePlanView } from "@/components/RoutePlanView";
@@ -12,6 +12,23 @@ import { stops } from "@/data/stops";
 import type { RoutePlan } from "@/data/types";
 import { findRoute } from "@/lib/router";
 
+const allStops = Object.values(stops);
+
+function findNearestStopId(lat: number, lng: number): string | null {
+  let bestId: string | null = null;
+  let bestDist = Infinity;
+  for (const stop of allStops) {
+    const dlat = stop.lat - lat;
+    const dlng = stop.lng - lng;
+    const dist = dlat * dlat + dlng * dlng;
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestId = stop.id;
+    }
+  }
+  return bestId;
+}
+
 function RouteFinderContent() {
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from") ?? "";
@@ -20,6 +37,8 @@ function RouteFinderContent() {
   const [toStopId, setToStopId] = useState("");
   const [plan, setPlan] = useState<RoutePlan | null>(null);
   const [searched, setSearched] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locError, setLocError] = useState<string | null>(null);
 
   function handleFindRoute() {
     if (!fromStopId || !toStopId) return;
@@ -27,6 +46,29 @@ function RouteFinderContent() {
     setPlan(result);
     setSearched(true);
   }
+
+  const handleUseLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocError("Geolocation is not supported by your browser");
+      return;
+    }
+    setLocating(true);
+    setLocError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const nearestId = findNearestStopId(position.coords.latitude, position.coords.longitude);
+        if (nearestId) {
+          setFromStopId(nearestId);
+        }
+        setLocating(false);
+      },
+      () => {
+        setLocError("Unable to get your location");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,11 +94,32 @@ function RouteFinderContent() {
 
       {/* Search inputs */}
       <main className="px-4 py-6 space-y-4">
-        <div>
+        <div className="relative z-10">
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
             From
           </label>
           <StopSearch placeholder="Where are you?" value={fromStopId} onSelect={setFromStopId} />
+          <button
+            type="button"
+            onClick={handleUseLocation}
+            disabled={locating}
+            className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 disabled:text-gray-400"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+              />
+            </svg>
+            {locating ? "Getting location..." : "Use my location"}
+          </button>
+          {locError && <p className="mt-1 text-xs text-red-500">{locError}</p>}
         </div>
 
         <div>
