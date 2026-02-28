@@ -36,6 +36,14 @@ export async function createLeafletMap(
   const leaflet = await import("leaflet");
   await ensureLeafletCss();
 
+  // If this container already has a Leaflet map (e.g. from a racing concurrent
+  // call in React strict mode), clean it up to prevent "Map container is
+  // already initialized" error.
+  if ("_leaflet_id" in container) {
+    delete (container as unknown as { _leaflet_id?: number })._leaflet_id;
+    container.innerHTML = "";
+  }
+
   const map = leaflet.map(container, {
     zoomControl: interactive,
     attributionControl: attribution,
