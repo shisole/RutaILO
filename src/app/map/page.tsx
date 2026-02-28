@@ -7,7 +7,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 import { routeWaypoints } from "@/data/waypoints";
-import { ensureLeafletCss } from "@/lib/leaflet-css";
+import { createLeafletMap } from "@/lib/leaflet-init";
+import { routePopupHtml, stopPopupHtml } from "@/lib/popup-html";
 
 // Build a lookup: stopId -> list of routes serving it
 function buildStopRoutesMap() {
@@ -83,9 +84,6 @@ export default function MapPage() {
     let cancelled = false;
 
     async function initMap() {
-      const leaflet = await import("leaflet");
-      await ensureLeafletCss();
-
       if (cancelled || !mapContainerRef.current) return;
 
       // Clean up previous map instance
@@ -94,25 +92,16 @@ export default function MapPage() {
         mapInstanceRef.current = null;
       }
 
-      const map = leaflet.map(mapContainerRef.current, {
-        zoomControl: true,
-        attributionControl: true,
-        dragging: true,
-        scrollWheelZoom: true,
-        doubleClickZoom: true,
-        boxZoom: true,
-        keyboard: true,
-        touchZoom: true,
+      const { leaflet, map } = await createLeafletMap(mapContainerRef.current, {
+        attribution: true,
       });
 
-      mapInstanceRef.current = map;
+      if (cancelled) {
+        map.remove();
+        return;
+      }
 
-      leaflet
-        .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        })
-        .addTo(map);
+      mapInstanceRef.current = map;
 
       // Track which stops we have already placed markers for
       const placedStopMarkers = new Set<string>();
@@ -133,28 +122,6 @@ export default function MapPage() {
               placedStopMarkers.add(stopId);
 
               const servingRoutes = stopRoutesMap[stopId] || [];
-              const colorDots = servingRoutes
-                .map(
-                  (r) =>
-                    `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color};margin-right:3px;" title="Route ${r.number}"></span>`,
-                )
-                .join("");
-
-              const routeList = servingRoutes
-                .map(
-                  (r) =>
-                    `<span style="display:flex;align-items:center;gap:4px;font-size:12px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0;"></span>${r.number}. ${r.name}</span>`,
-                )
-                .join("");
-
-              const popupHtml = `
-                <div style="min-width:160px;max-width:260px;">
-                  <div style="font-weight:600;font-size:14px;margin-bottom:4px;">${stop.name}</div>
-                  <div style="margin-bottom:6px;">${colorDots}</div>
-                  <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px;">${routeList}</div>
-                  <a href="/s/${stop.id}" style="color:#2563eb;font-size:12px;text-decoration:underline;">View stop details</a>
-                </div>
-              `;
 
               const marker = leaflet
                 .circleMarker([stop.lat, stop.lng], {
@@ -164,7 +131,7 @@ export default function MapPage() {
                   fillOpacity: 1,
                   weight: 2,
                 })
-                .bindPopup(popupHtml)
+                .bindPopup(stopPopupHtml(stop, servingRoutes))
                 .addTo(map);
 
               markers.push(marker);
@@ -177,23 +144,13 @@ export default function MapPage() {
         const polyCoords: L.LatLngTuple[] = waypoints ?? coords;
 
         if (polyCoords.length > 1) {
-          const routePopupHtml = `
-            <div style="min-width:140px;">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${route.color};flex-shrink:0;"></span>
-                <span style="font-weight:600;font-size:14px;">Route ${route.number}</span>
-              </div>
-              <div style="font-size:13px;color:#374151;">${route.name}</div>
-            </div>
-          `;
-
           const polyline = leaflet
             .polyline(polyCoords, {
               color: route.color,
               weight: 4,
               opacity: 0.85,
             })
-            .bindPopup(routePopupHtml)
+            .bindPopup(routePopupHtml(route))
             .addTo(map);
 
           routeLayersRef.current.set(route.id, { polyline, markers });

@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { stops } from "@/data/stops";
 import type { Route } from "@/data/types";
 import { routeWaypoints } from "@/data/waypoints";
-import { ensureLeafletCss } from "@/lib/leaflet-css";
+import { createLeafletMap } from "@/lib/leaflet-init";
 
 interface RouteMapProps {
   routesToShow: Route[];
@@ -24,9 +24,6 @@ export function RouteMap({ routesToShow, highlightStopId, height = "200px" }: Ro
     let cancelled = false;
 
     async function initMap() {
-      const leaflet = await import("leaflet");
-      await ensureLeafletCss();
-
       if (cancelled || !mapContainerRef.current) return;
 
       // Clean up previous map instance if it exists
@@ -35,24 +32,16 @@ export function RouteMap({ routesToShow, highlightStopId, height = "200px" }: Ro
         mapInstanceRef.current = null;
       }
 
-      const map = leaflet.map(mapContainerRef.current, {
-        zoomControl: false,
-        attributionControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        touchZoom: false,
+      const { leaflet, map } = await createLeafletMap(mapContainerRef.current, {
+        interactive: false,
       });
 
-      mapInstanceRef.current = map;
+      if (cancelled) {
+        map.remove();
+        return;
+      }
 
-      leaflet
-        .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-        })
-        .addTo(map);
+      mapInstanceRef.current = map;
 
       const allLatLngs: L.LatLngTuple[] = [];
 

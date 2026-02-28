@@ -7,50 +7,13 @@ import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 import { type RoutePlan } from "@/data/types";
 import { routeWaypoints } from "@/data/waypoints";
-import { ensureLeafletCss } from "@/lib/leaflet-css";
+import { createLeafletMap } from "@/lib/leaflet-init";
+import { markerPopupHtml, routePopupHtml } from "@/lib/popup-html";
+import { buildRouteMap, buildStopWaypointIndices } from "@/lib/route-utils";
 
 interface RoutePlanMapProps {
   plan: RoutePlan;
   height?: string;
-}
-
-/**
- * For each stop in the route (in order), find its closest waypoint index,
- * constrained so indices are monotonically non-decreasing. This prevents
- * a stop from matching a waypoint on a different segment when the road
- * geometry loops near another part of the route.
- */
-function buildStopWaypointIndices(
-  waypoints: [number, number][],
-  stopIds: string[],
-): number[] {
-  const indices: number[] = [];
-  let searchFrom = 0;
-
-  for (const stopId of stopIds) {
-    const stop = stops[stopId];
-    if (!stop) {
-      indices.push(searchFrom);
-      continue;
-    }
-
-    let bestIdx = searchFrom;
-    let bestDist = Infinity;
-    for (let i = searchFrom; i < waypoints.length; i++) {
-      const dlat = waypoints[i][0] - stop.lat;
-      const dlng = waypoints[i][1] - stop.lng;
-      const dist = dlat * dlat + dlng * dlng;
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIdx = i;
-      }
-    }
-
-    indices.push(bestIdx);
-    searchFrom = bestIdx;
-  }
-
-  return indices;
 }
 
 export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
@@ -63,9 +26,6 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
     let cancelled = false;
 
     async function initMap() {
-      const leaflet = await import("leaflet");
-      await ensureLeafletCss();
-
       if (cancelled || !mapContainerRef.current) return;
 
       // Clean up previous map instance
@@ -74,26 +34,16 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
         mapInstanceRef.current = null;
       }
 
-      const map = leaflet.map(mapContainerRef.current, {
-        zoomControl: true,
-        attributionControl: false,
-        dragging: true,
-        scrollWheelZoom: true,
-        doubleClickZoom: true,
-        boxZoom: true,
-        keyboard: true,
-        touchZoom: true,
-      });
+      const { leaflet, map } = await createLeafletMap(mapContainerRef.current);
+
+      if (cancelled) {
+        map.remove();
+        return;
+      }
 
       mapInstanceRef.current = map;
 
-      leaflet
-        .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-        })
-        .addTo(map);
-
-      const routeMap = new Map(routes.map((r) => [r.id, r]));
+      const routeMap = buildRouteMap(routes);
       const allLatLngs: L.LatLngTuple[] = [];
 
       for (const step of plan.steps) {
@@ -139,9 +89,7 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
               weight: 4,
               opacity: 0.9,
             })
-            .bindPopup(
-              `<div style="font-weight:600;font-size:13px;">Route ${route.number} &mdash; ${route.name}</div>`,
-            )
+            .bindPopup(routePopupHtml(route))
             .addTo(map);
 
           for (const coord of segmentCoords) {
@@ -173,9 +121,7 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
             fillOpacity: 1,
             weight: 2,
           })
-          .bindPopup(
-            `<div><strong>${transferStop.name}</strong><br/><span style="color:#F97316;font-size:12px;">Transfer point</span></div>`,
-          )
+          .bindPopup(markerPopupHtml(transferStop.name, "Transfer point", "#F97316"))
           .addTo(map);
         allLatLngs.push([transferStop.lat, transferStop.lng]);
       }
@@ -190,9 +136,7 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
             fillOpacity: 1,
             weight: 2,
           })
-          .bindPopup(
-            `<div><strong>${originStop.name}</strong><br/><span style="color:#16A34A;font-size:12px;">Origin</span></div>`,
-          )
+          .bindPopup(markerPopupHtml(originStop.name, "Origin", "#16A34A"))
           .addTo(map);
         allLatLngs.push([originStop.lat, originStop.lng]);
       }
@@ -207,9 +151,7 @@ export function RoutePlanMap({ plan, height = "250px" }: RoutePlanMapProps) {
             fillOpacity: 1,
             weight: 2,
           })
-          .bindPopup(
-            `<div><strong>${destStop.name}</strong><br/><span style="color:#DC2626;font-size:12px;">Destination</span></div>`,
-          )
+          .bindPopup(markerPopupHtml(destStop.name, "Destination", "#DC2626"))
           .addTo(map);
         allLatLngs.push([destStop.lat, destStop.lng]);
       }
