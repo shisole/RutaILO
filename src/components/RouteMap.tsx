@@ -6,26 +6,12 @@ import { useEffect, useRef } from "react";
 import { stops } from "@/data/stops";
 import type { Route } from "@/data/types";
 import { routeWaypoints } from "@/data/waypoints";
+import { ensureLeafletCss } from "@/lib/leaflet-css";
 
 interface RouteMapProps {
   routesToShow: Route[];
   highlightStopId?: string;
   height?: string;
-}
-
-function ensureLeafletCss(): Promise<void> {
-  const LEAFLET_CSS_ID = "leaflet-css";
-  const existing = document.getElementById(LEAFLET_CSS_ID);
-  if (existing) return Promise.resolve();
-  return new Promise((resolve) => {
-    const link = document.createElement("link");
-    link.id = LEAFLET_CSS_ID;
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    link.onload = () => resolve();
-    link.onerror = () => resolve();
-    document.head.appendChild(link);
-  });
 }
 
 export function RouteMap({ routesToShow, highlightStopId, height = "200px" }: RouteMapProps) {

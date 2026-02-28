@@ -7,21 +7,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 import { routeWaypoints } from "@/data/waypoints";
-
-function ensureLeafletCss(): Promise<void> {
-  const LEAFLET_CSS_ID = "leaflet-css";
-  const existing = document.getElementById(LEAFLET_CSS_ID);
-  if (existing) return Promise.resolve();
-  return new Promise((resolve) => {
-    const link = document.createElement("link");
-    link.id = LEAFLET_CSS_ID;
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    link.onload = () => resolve();
-    link.onerror = () => resolve(); // still proceed if CDN fails
-    document.head.appendChild(link);
-  });
-}
+import { ensureLeafletCss } from "@/lib/leaflet-css";
 
 // Build a lookup: stopId -> list of routes serving it
 function buildStopRoutesMap() {
