@@ -6,14 +6,19 @@ import type L from "leaflet";
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
 
-function ensureLeafletCss() {
+function ensureLeafletCss(): Promise<void> {
   const LEAFLET_CSS_ID = "leaflet-css";
-  if (document.getElementById(LEAFLET_CSS_ID)) return;
-  const link = document.createElement("link");
-  link.id = LEAFLET_CSS_ID;
-  link.rel = "stylesheet";
-  link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-  document.head.appendChild(link);
+  const existing = document.getElementById(LEAFLET_CSS_ID);
+  if (existing) return Promise.resolve();
+  return new Promise((resolve) => {
+    const link = document.createElement("link");
+    link.id = LEAFLET_CSS_ID;
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    link.onload = () => resolve();
+    link.onerror = () => resolve(); // still proceed if CDN fails
+    document.head.appendChild(link);
+  });
 }
 
 // Build a lookup: stopId -> list of routes serving it
@@ -95,7 +100,7 @@ export default function MapPage() {
 
     async function initMap() {
       const leaflet = await import("leaflet");
-      ensureLeafletCss();
+      await ensureLeafletCss();
 
       if (cancelled || !mapContainerRef.current) return;
 
@@ -215,6 +220,11 @@ export default function MapPage() {
 
       // Fit map to Iloilo City area
       map.setView([10.71, 122.555], 14);
+
+      // Force Leaflet to recalculate container size (fixes blank/black tiles)
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
     }
 
     initMap();
