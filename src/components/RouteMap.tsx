@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { Route } from "@/data/types";
 import { stops } from "@/data/stops";
+import { routeWaypoints } from "@/data/waypoints";
 import type L from "leaflet";
 
 interface RouteMapProps {
@@ -85,9 +86,9 @@ export function RouteMap({
           }
         }
 
-        // Use waypoints for polyline if available, otherwise fall back to stop coords
-        const polyCoords: L.LatLngTuple[] = route.waypoints
-          ? route.waypoints as L.LatLngTuple[]
+        // Use OSRM road-snapped waypoints if available, otherwise fall back to stop coords
+        const polyCoords: L.LatLngTuple[] = routeWaypoints[route.id]
+          ? routeWaypoints[route.id] as L.LatLngTuple[]
           : coords;
 
         if (polyCoords.length > 1) {

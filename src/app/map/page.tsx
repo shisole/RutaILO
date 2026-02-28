@@ -5,6 +5,7 @@ import Link from "next/link";
 import type L from "leaflet";
 import { routes } from "@/data/routes";
 import { stops } from "@/data/stops";
+import { routeWaypoints } from "@/data/waypoints";
 
 function ensureLeafletCss(): Promise<void> {
   const LEAFLET_CSS_ID = "leaflet-css";
@@ -189,9 +190,9 @@ export default function MapPage() {
           }
         }
 
-        // Use waypoints for polyline if available, otherwise fall back to stop coords
-        const polyCoords: L.LatLngTuple[] = route.waypoints
-          ? route.waypoints as L.LatLngTuple[]
+        // Use OSRM road-snapped waypoints if available, otherwise fall back to stop coords
+        const polyCoords: L.LatLngTuple[] = routeWaypoints[route.id]
+          ? routeWaypoints[route.id] as L.LatLngTuple[]
           : coords;
 
         if (polyCoords.length > 1) {
