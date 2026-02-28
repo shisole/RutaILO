@@ -1,4 +1,5 @@
 import type { Route, Stop, RoutePlan, TransferStep } from "@/data/types";
+import { buildRouteMap } from "@/lib/route-utils";
 
 /**
  * BFS node representing a state in the route search.
@@ -25,17 +26,6 @@ function buildStopRoutesMap(routes: Route[]): Map<string, Set<string>> {
     }
   }
   return stopRoutes;
-}
-
-/**
- * Build a map from route ID to Route object for quick lookup.
- */
-function buildRouteMap(routes: Route[]): Map<string, Route> {
-  const routeMap = new Map<string, Route>();
-  for (const route of routes) {
-    routeMap.set(route.id, route);
-  }
-  return routeMap;
 }
 
 /**
