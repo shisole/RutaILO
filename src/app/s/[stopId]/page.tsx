@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { stops } from "@/data/stops";
 import { routes } from "@/data/routes";
 import { RouteCard } from "@/components/RouteCard";
+import { RouteMap } from "@/components/RouteMap";
 
 export function generateStaticParams() {
   return Object.keys(stops).map((stopId) => ({
@@ -55,6 +56,11 @@ export default async function StopViewPage({
           pass{servingRoutes.length === 1 ? "es" : ""} through here
         </p>
       </header>
+
+      {/* Map */}
+      <div className="px-4 pt-4">
+        <RouteMap routesToShow={servingRoutes} highlightStopId={stopId} />
+      </div>
 
       {/* Route list */}
       <main className="px-4 py-6">
